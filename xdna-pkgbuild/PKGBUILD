@@ -1,0 +1,99 @@
+pkgname=
+pkgver=2.17.0
+pkgrel=1
+pkgdesc="Xilinx Runtime"
+arch=('x86_64')
+url="https://github.com/Xilinx/XRT"
+license=('EULA')
+groups=('base-devel')
+
+# someone who is installing this on a fresh system should check the dependencies
+# and add the missing ones, or move the build dependencies into makedepends
+depends=(
+	xrt-git
+	xbflash-git
+	ocl-icd
+	protobuf
+	protobuf-c
+	python-protobuf
+	curl
+	dkms
+	perl
+	gnuplot
+	graphviz
+	boost-libs
+	libcurl-gnutls
+	libdrm
+    libdwarf
+	libelf
+	libffi
+    gtest
+	libjpeg-turbo
+	json-glib
+	ncurses5-compat-libs
+	opencv
+	libpng
+	openssl
+	systemd
+	systemd-libs
+	libtiff
+    libyaml
+	glibc
+	lm_sensors
+	lsb-release
+    opencl-headers
+	pciutils
+	rapidjson
+	pkgconfig
+	python
+	python-pip
+    python-breathe
+	python-sphinx
+	strace
+	unzip
+	util-linux-libs
+	elfio
+)
+makedepends=(git cppcheck make cmake gcc gdb)
+
+#optdepends=(vivado)
+source=(
+	"git+https://github.com/amd/xdna-driver.git#commit=cc2767aba2f10e377ddf054ae0583dbc2e3e6127"
+	"git+https://github.com/Xilinx/XRT.git#commit=baf88820fb3fc24dda4dc08c91ecbca2c76c7b0f"
+	CMakeLists.patch
+)
+md5sums=(SKIP SKIP 1d841ce6fae458193b573abf1b8e485b)
+
+pkgname=(xdna-driver-git)
+
+prepare() {
+	# the patch adds a generic include to /usr/include for libdrm
+	# and a clever redirect from <drm/drm.h> to <libdrm/drm.h>
+	patch -d xdna-driver -Np1 -i ../CMakeLists.patch
+	cat xdna-driver/src/shim/CMakeLists.txt
+
+	cd xdna-driver
+	git submodule init
+	git config submodule.xrt.url "$srcdir/XRT"
+	git -c protocol.file.allow=always submodule update
+
+ 	# redirect from <drm/drm.h> to <libdrm/drm.h>
+	# because drm/drm.h is only available to kernel modules
+	# and libdrm/drm.h is only available to userspace
+	mkdir -p src/include/drm
+	echo "#include <libdrm/drm.h>" > src/include/drm/drm.h
+}
+
+build() {
+	cd xdna-driver/build
+	./build.sh -release
+	./build.sh -package
+}
+
+package() {
+	cd xdna-driver/build/Release
+	ar xv xrt_plugin.${pkgver}_*-amdxdna.deb
+	tar -zxf data.tar.gz -C "${pkgdir}"
+	mkdir -p "${pkgdir}/usr"
+	mv "${pkgdir}/lib" "${pkgdir}/usr/lib"
+}

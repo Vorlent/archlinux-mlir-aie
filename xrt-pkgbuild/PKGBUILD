@@ -1,0 +1,88 @@
+pkgname=
+pkgver=2.17.0
+pkgrel=1
+pkgdesc="Xilinx Runtime"
+arch=('x86_64')
+url="https://github.com/Xilinx/XRT"
+license=('EULA')
+groups=('base-devel')
+
+# someone who is installing this on a fresh system should check the dependencies
+# and add the missing ones, or move the build dependencies into makedepends
+depends=(ocl-icd
+	protobuf
+	protobuf-c
+	python-protobuf
+	curl
+	dkms
+	perl
+	gnuplot
+	graphviz
+	boost-libs
+	libcurl-gnutls
+	libdrm
+    libdwarf
+	libelf
+	libffi
+    gtest
+	libjpeg-turbo
+	json-glib
+	ncurses5-compat-libs
+	opencv
+	libpng
+	openssl
+	systemd
+	systemd-libs
+	libtiff
+    libyaml
+	glibc
+	lm_sensors
+	lsb-release
+    opencl-headers
+	pciutils
+	rapidjson
+	pkgconfig
+	python
+	python-pip
+    python-breathe
+	python-sphinx
+	strace
+	unzip
+	util-linux-libs
+)
+makedepends=(git cppcheck make cmake gcc gdb)
+# libncurses5 \
+
+#optdepends=(vivado)
+#source=(xrt_202410.${pkgver}_--xrt.tar.gz xrt_202410.${pkgver}_--xbflash.tar.gz)
+# xdna-driver:git+https://github.com/amd/xdna-driver.git#commit=b6db49f792a48123a016ba052d0c2103862547ee
+source=(
+	"git+https://github.com/Xilinx/XRT.git#commit=baf88820fb3fc24dda4dc08c91ecbca2c76c7b0f"
+	"absl.patch"
+)
+md5sums=(SKIP 3de17162aab42c86a29eb9cc3c207719)
+
+pkgname=(xrt-git xbflash-git)
+
+prepare() {
+	ls -la XRT/src/runtime_src/core/pcie/emulation/*
+	patch -d XRT -Np1 -i ../absl.patch
+}
+
+build() {
+	cd XRT/build
+	./build.sh
+	cd Release
+	make package
+}
+
+package_xrt-git() {
+	cd XRT/build/Release
+	tar -zxf xrt_202410.${pkgver}_--xrt.tar.gz -C "${pkgdir}"
+	mv "${pkgdir}/lib" "${pkgdir}/usr/lib"
+}
+
+package_xbflash-git() {
+	cd XRT/build/Release
+	tar -zxf xrt_202410.${pkgver}_--xbflash.tar.gz -C "${pkgdir}"
+}

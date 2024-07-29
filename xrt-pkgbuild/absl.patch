@@ -1,0 +1,68 @@
+diff --git a/src/runtime_src/core/pcie/emulation/hw_emu/CMakeLists.txt b/src/runtime_src/core/pcie/emulation/hw_emu/CMakeLists.txt
+index 5bf04bbd6..31058e567 100644
+--- a/src/runtime_src/core/pcie/emulation/hw_emu/CMakeLists.txt
++++ b/src/runtime_src/core/pcie/emulation/hw_emu/CMakeLists.txt
+@@ -43,6 +43,8 @@ add_library(xrt_hwemu_static STATIC ${CURR_SOURCE}
+ set_target_properties(xrt_hwemu PROPERTIES VERSION ${XRT_VERSION_STRING}
+   SOVERSION ${XRT_SOVERSION})
+ 
++find_package( absl REQUIRED )
++
+ target_link_libraries(xrt_hwemu
+   PRIVATE
+   ${Boost_SYSTEM_LIBRARY}
+@@ -51,6 +53,8 @@ target_link_libraries(xrt_hwemu
+   common_em
+   rt
+   uuid
++  absl::log_internal_message
++  absl::log_internal_check_op
+   )
+ 
+ target_link_libraries(xrt_hwemu_static
+@@ -60,7 +64,9 @@ target_link_libraries(xrt_hwemu_static
+   xrt_coreutil_static
+   rt
+   uuid
+-  )
++  absl::log_internal_message
++  absl::log_internal_check_op
++)
+ 
+ install (TARGETS xrt_hwemu
+   EXPORT xrt-targets
+diff --git a/src/runtime_src/core/pcie/emulation/sw_emu/CMakeLists.txt b/src/runtime_src/core/pcie/emulation/sw_emu/CMakeLists.txt
+index 247b50602..25b81733b 100644
+--- a/src/runtime_src/core/pcie/emulation/sw_emu/CMakeLists.txt
++++ b/src/runtime_src/core/pcie/emulation/sw_emu/CMakeLists.txt
+@@ -39,6 +39,8 @@ add_library(xrt_swemu_static STATIC ${CURR_SOURCE}
+ set_target_properties(xrt_swemu PROPERTIES VERSION ${XRT_VERSION_STRING}
+   SOVERSION ${XRT_SOVERSION})
+ 
++find_package( absl REQUIRED )
++
+ target_link_libraries(xrt_swemu
+   PRIVATE
+   ${Boost_SYSTEM_LIBRARY}
+@@ -47,7 +49,9 @@ target_link_libraries(xrt_swemu
+   common_em
+   rt
+   uuid
+-  )
++  absl::log_internal_message
++  absl::log_internal_check_op
++)
+ 
+ target_link_libraries(xrt_swemu_static
+   INTERFACE
+@@ -56,7 +60,9 @@ target_link_libraries(xrt_swemu_static
+   xrt_coreutil_static
+   rt
+   uuid
+-  )
++  absl::log_internal_message
++  absl::log_internal_check_op
++)
+ 
+ install (TARGETS xrt_swemu
+   EXPORT xrt-targets

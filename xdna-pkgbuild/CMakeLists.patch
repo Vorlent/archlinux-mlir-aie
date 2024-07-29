@@ -1,0 +1,13 @@
+diff --git a/src/shim/CMakeLists.txt b/src/shim/CMakeLists.txt
+index 48bfac6..9f8afa5 100644
+--- a/src/shim/CMakeLists.txt
++++ b/src/shim/CMakeLists.txt
+@@ -39,6 +39,8 @@ target_include_directories(${XDNA_TARGET} PRIVATE
+   ${XRT_SOURCE_DIR}/src/runtime_src/core/include
+   ${XRT_BINARY_DIR}/src/gen
+   ${CMAKE_CURRENT_SOURCE_DIR}/../include/uapi
++  ${CMAKE_CURRENT_SOURCE_DIR}/../include/
++  /usr/include/
+   )
+ 
+ # driver plugin will be loaded while xrt_core is still being
